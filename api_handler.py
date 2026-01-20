@@ -1,5 +1,21 @@
+import os
 import requests
 
+# =========================
+# PATH SETUP (PORTABLE)
+# =========================
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+
+# Ensure data folder exists
+os.makedirs(DATA_DIR, exist_ok=True)
+
+ENRICHED_DATA_FILE = os.path.join(DATA_DIR, "enriched_sales_data.txt")
+
+# =========================
+# API CONFIG
+# =========================
 
 API_URL = "https://dummyjson.com/products"
 
@@ -59,19 +75,19 @@ def enrich_sales_data(transactions, product_mapping):
 
         try:
             # Extract numeric ID from ProductID (P101 -> 101)
-            product_id_str = "".join(filter(str.isdigit, tx["ProductID"]))
+            product_id_str = "".join(filter(str.isdigit, tx.get("ProductID", "")))
             product_id = int(product_id_str)
 
             if product_id in product_mapping:
                 api_data = product_mapping[product_id]
 
-                enriched_tx["API_Category"] = api_data["category"]
-                enriched_tx["API_Brand"] = api_data["brand"]
-                enriched_tx["API_Rating"] = api_data["rating"]
+                enriched_tx["API_Category"] = api_data.get("category")
+                enriched_tx["API_Brand"] = api_data.get("brand")
+                enriched_tx["API_Rating"] = api_data.get("rating")
                 enriched_tx["API_Match"] = True
 
         except Exception:
-            pass  # Gracefully ignore any enrichment errors
+            pass  # Gracefully ignore enrichment errors
 
         enriched_transactions.append(enriched_tx)
 
@@ -81,7 +97,7 @@ def enrich_sales_data(transactions, product_mapping):
     return enriched_transactions
 
 
-def save_enriched_data(enriched_transactions, filename="C:/Users/xcite/Documents/sales-analytics-system/data/enriched_sales_data.txt"):
+def save_enriched_data(enriched_transactions, filename=ENRICHED_DATA_FILE):
     """
     Saves enriched transactions back to file
     """
@@ -96,23 +112,23 @@ def save_enriched_data(enriched_transactions, filename="C:/Users/xcite/Documents
 
             for tx in enriched_transactions:
                 row = [
-                    tx.get("TransactionID"),
-                    tx.get("Date"),
-                    tx.get("ProductID"),
-                    tx.get("ProductName"),
-                    str(tx.get("Quantity")),
-                    str(tx.get("UnitPrice")),
-                    tx.get("CustomerID"),
-                    tx.get("Region"),
-                    str(tx.get("API_Category")) if tx.get("API_Category") is not None else "",
-                    str(tx.get("API_Brand")) if tx.get("API_Brand") is not None else "",
-                    str(tx.get("API_Rating")) if tx.get("API_Rating") is not None else "",
-                    str(tx.get("API_Match")),
+                    str(tx.get("TransactionID", "")),
+                    str(tx.get("Date", "")),
+                    str(tx.get("ProductID", "")),
+                    str(tx.get("ProductName", "")),
+                    str(tx.get("Quantity", "")),
+                    str(tx.get("UnitPrice", "")),
+                    str(tx.get("CustomerID", "")),
+                    str(tx.get("Region", "")),
+                    str(tx.get("API_Category", "")) if tx.get("API_Category") else "",
+                    str(tx.get("API_Brand", "")) if tx.get("API_Brand") else "",
+                    str(tx.get("API_Rating", "")) if tx.get("API_Rating") else "",
+                    str(tx.get("API_Match", False)),
                 ]
 
                 file.write("|".join(row) + "\n")
 
-        print(f"Enriched data saved to {filename}")
+        print(f" Enriched data saved to {filename}")
 
     except IOError as e:
-        print(f"Failed to write enriched data file: {e}")
+        print(f" Failed to write enriched data file: {e}")
