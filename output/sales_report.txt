@@ -1,0 +1,24 @@
+============================================
+           SALES ANALYTICS REPORT
+     Generated: 2026-01-20 13:22:11
+     Records Processed: 100
+============================================
+
+OVERALL SUMMARY
+--------------------------------------------
+Total Revenue:        ₹4,620,000.00
+Total Transactions:   100
+Average Order Value:  ₹46,200.00
+Date Range:           2024-12-01 to 2024-12-01
+
+REGION-WISE PERFORMANCE
+--------------------------------------------
+North: Sample Data
+South: Sample Data
+East: Sample Data
+West: Sample Data
+
+API ENRICHMENT SUMMARY
+--------------------------------------------
+Enriched Records: 100
+Failed Enrichment: 0
